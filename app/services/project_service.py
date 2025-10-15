@@ -1,5 +1,8 @@
+from datetime import timezone, datetime
+
 from app.models import Project
 from app.repository.project_repository import ProjectRepository
+from app.schemas.project import ProjectCreate
 
 
 class ProjectService:
@@ -11,3 +14,12 @@ class ProjectService:
         if not project:
             raise Exception("Project not found")
         return project
+
+    def create_project(self, project_data: ProjectCreate) -> Project:
+        now = datetime.now(timezone.utc)
+        project = Project(
+            name=project_data.name,
+            description=project_data.description,
+            created_at=now
+        )
+        return self.project_repository.create(project)
