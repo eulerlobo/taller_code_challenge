@@ -2,7 +2,7 @@ from datetime import timezone, datetime
 
 from app.models import Project
 from app.repository.project_repository import ProjectRepository
-from app.schemas.project import ProjectCreate
+from app.schemas.project import ProjectCreate, ProjectUpdate
 
 
 class ProjectService:
@@ -23,3 +23,13 @@ class ProjectService:
             created_at=now
         )
         return self.project_repository.create(project)
+
+    def update_project(self, project_id: int, project_data: ProjectUpdate) -> Project:
+        project = self.get_project_by_id(project_id)
+
+        if project_data.name is not None:
+            project.name = project_data.name
+        if project_data.description is not None:
+            project.description = project_data.description
+
+        return self.project_repository.update(project)

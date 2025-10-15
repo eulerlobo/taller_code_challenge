@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.repository.project_repository import ProjectRepository
-from app.schemas.project import ProjectResponse, ProjectCreate
+from app.schemas.project import ProjectResponse, ProjectCreate, ProjectUpdate
 from app.services.project_service import ProjectService
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -33,6 +33,22 @@ def get_project(
     try:
         project = project_service.get_project_by_id(project_id)
 
+        return ProjectResponse.model_validate(project)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+
+@router.patch("/{project_id}", response_model=ProjectResponse)
+def update_project(
+    project_id: Annotated[int, Path(description="ID of the project to update")],
+    project_data: ProjectUpdate,
+    project_service: Annotated[ProjectService, Depends(get_project_service)],
+) -> ProjectResponse:
+    if project_data.name is None and project_data.description is None:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    try:
+        project = project_service.update_project(project_id, project_data)
         return ProjectResponse.model_validate(project)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Project not found")

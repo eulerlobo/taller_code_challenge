@@ -12,3 +12,8 @@ class ProjectRepository:
         self.db.commit()
         self.db.refresh(project)
         return project
+
+    def update(self, project: Project) -> Project:
+        self.db.commit()
+        self.db.refresh(project)
+        return project
