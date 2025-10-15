@@ -52,3 +52,14 @@ def update_project(
         return ProjectResponse.model_validate(project)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Project not found")
+
+@router.delete("/{project_id}")
+def delete_project(
+    project_id: Annotated[int, Path(description="ID of the project to delete")],
+    project_service: Annotated[ProjectService, Depends(get_project_service)],
+) -> ProjectResponse:
+    try:
+        project = project_service.delete_project(project_id)
+        return ProjectResponse.model_validate(project)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Project not found")

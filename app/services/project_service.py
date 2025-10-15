@@ -33,3 +33,7 @@ class ProjectService:
             project.description = project_data.description
 
         return self.project_repository.update(project)
+
+    def delete_project(self, project_id: int) -> Project:
+        project = self.get_project_by_id(project_id)
+        return self.project_repository.delete(project)
