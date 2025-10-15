@@ -9,5 +9,5 @@ class Task(Base):
     project_id = Column(Integer, ForeignKey("project.id"))
     title = Column(String(100), nullable=False)
     priority = Column(Integer, nullable=False, default=0)
-    complete = Column(Boolean, nullable=False, default=False)
-    due_data = Column(DateTime(timezone=True), nullable=True)
+    completed = Column(Boolean, nullable=False, default=False)
+    due_date = Column(DateTime(timezone=True), nullable=True)

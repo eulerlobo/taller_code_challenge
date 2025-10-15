@@ -9,7 +9,7 @@ class TaskResponse(BaseModel):
     project_id: int
     title: str
     priority: int
-    complete: bool
-    due_data: Optional[datetime] = None
+    completed: bool
+    due_date: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
