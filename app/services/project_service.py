@@ -1,9 +1,9 @@
 from datetime import timezone, datetime
 
+from app.exceptions.project import ProjectNotFoundException
 from app.models import Project
 from app.repository.project_repository import ProjectRepository
 from app.schemas.project import ProjectCreate, ProjectUpdate
-
 
 class ProjectService:
     def __init__(self, project_repository: ProjectRepository):
@@ -12,7 +12,7 @@ class ProjectService:
     def get_project_by_id(self, project_id: int) -> Project:
         project = self.project_repository.get_by_id(project_id)
         if not project:
-            raise Exception("Project not found")
+            raise ProjectNotFoundException(project_id)
         return project
 
     def create_project(self, project_data: ProjectCreate) -> Project:
