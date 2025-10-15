@@ -38,7 +38,7 @@ def get_project(
         raise HTTPException(status_code=404, detail="Project not found")
 
 
-@router.patch("/{project_id}", response_model=ProjectResponse)
+@router.put("/{project_id}", response_model=ProjectResponse)
 def update_project(
     project_id: Annotated[int, Path(description="ID of the project to update")],
     project_data: ProjectUpdate,
