@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_404_NOT_FOUND, HTTP_400_BAD_REQUEST
 
@@ -31,7 +31,7 @@ def get_task_service(
 
 @router.put("/{task_id}")
 async def update_task(
-    task_id: Annotated[int, "The ID of the task to update"],
+    task_id: Annotated[int, Path(description="The ID of the task to update")],
     task_data: TaskUpdate,
     project_service: Annotated[ProjectService, Depends(get_project_service)],
     task_service: Annotated[TaskService, Depends(get_task_service)]
@@ -46,3 +46,16 @@ async def update_task(
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=e.message)
     except TaskNotFoundException as e:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=e.message)
+
+@router.delete("/{task_id}")
+def delete_task(
+    task_id: Annotated[int, Path(description="The ID of the task to delete")],
+    task_service: Annotated[TaskService, Depends(get_task_service)],
+) -> TaskResponse:
+    try:
+        task = task_service.delete_task(task_id)
+        return TaskResponse.model_validate(task)
+    except TaskNotFoundException as e:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND, detail=e.message
+        ) from e

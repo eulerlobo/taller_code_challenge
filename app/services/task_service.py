@@ -5,7 +5,6 @@ from app.models.task import Task
 from app.repository.task_repository import TaskRepository
 from app.schemas.task import TaskCreate, TaskUpdate
 
-
 class TaskService:
     def __init__(self, task_repository: TaskRepository):
         self.task_repository = task_repository
@@ -44,3 +43,7 @@ class TaskService:
             task.due_date = task_data.due_date
 
         return self.task_repository.update(task)
+
+    def delete_task(self, task_id: int) -> Task:
+        task = self.get_task_by_id(task_id)
+        return self.task_repository.delete(task)
