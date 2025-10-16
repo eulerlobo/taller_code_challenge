@@ -10,6 +10,13 @@ class TaskCreate(BaseModel):
     completed: bool = False
     due_date: Optional[datetime] = None
 
+class TaskUpdate(BaseModel):
+    project_id: Optional[int] = None
+    title: Optional[str] = Field(None, min_length=1, max_length=100)
+    priority: Optional[int] = None
+    completed: Optional[bool] = None
+    due_date: Optional[datetime] = None
+
 class TaskResponse(BaseModel):
     """Schema for task response"""
     id: int
