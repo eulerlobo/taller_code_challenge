@@ -10,8 +10,13 @@ class TaskRepository:
         self.db = db
 
     async def get_by_project_id(self, project_id: int) -> List[Dict[str, Any]]:
-        query = select(task).where(task.c.project_id == project_id)
-        results = await self.db.fetch_all(query)
+        query = (
+            "SELECT id, project_id, title, priority, completed, due_date "
+            "FROM task "
+            "WHERE project_id = :project_id "
+            "ORDER BY priority DESC"
+        )
+        results = await self.db.fetch_all(query, {"project_id": project_id})
         return [dict(row) for row in results]
 
     async def get_by_id(self, id: int) -> Optional[Dict[str, Any]]:

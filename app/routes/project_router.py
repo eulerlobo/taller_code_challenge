@@ -87,7 +87,6 @@ async def get_project_tasks(
     project_service: Annotated[ProjectService, Depends(get_project_service)],
     task_service: Annotated[TaskService, Depends(get_task_service)],
 ) -> List[TaskResponse]:
-    # TODO: Implement pagination and sorted by priority
     try:
         await project_service.get_project_by_id(project_id)
         tasks = await task_service.get_tasks_by_project_id(project_id)
