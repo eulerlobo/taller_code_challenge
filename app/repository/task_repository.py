@@ -1,29 +1,40 @@
-from typing import List
+from typing import List, Optional, Dict, Any
+from databases import Database
+from sqlalchemy import select, insert, update, delete
 
-from app.models.task import Task
+from app.models.task import task
+
 
 class TaskRepository:
-    def __init__(self, db):
+    def __init__(self, db: Database):
         self.db = db
 
-    def get_by_project_id(self, project_id: int) -> List[Task]:
-        return self.db.query(Task).filter(Task.project_id == project_id).all()
+    async def get_by_project_id(self, project_id: int) -> List[Dict[str, Any]]:
+        query = select(task).where(task.c.project_id == project_id)
+        results = await self.db.fetch_all(query)
+        return [dict(row) for row in results]
 
-    def get_by_id(self, id):
-        return self.db.query(Task).filter(Task.id == id).first()
+    async def get_by_id(self, id: int) -> Optional[Dict[str, Any]]:
+        query = select(task).where(task.c.id == id)
+        result = await self.db.fetch_one(query)
+        return dict(result) if result else None
 
-    def create(self, task: Task) -> Task:
-        self.db.add(task)
-        self.db.commit()
-        self.db.refresh(task)
-        return task
+    async def create(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
+        query = insert(task).values(**task_data).returning(task)
+        result = await self.db.fetch_one(query)
+        return dict(result)
 
-    def update(self, task: Task) -> Task:
-        self.db.commit()
-        self.db.refresh(task)
-        return task
+    async def update(self, id: int, task_data: Dict[str, Any]) -> Dict[str, Any]:
+        query = (
+            update(task)
+            .where(task.c.id == id)
+            .values(**task_data)
+            .returning(task)
+        )
+        result = await self.db.fetch_one(query)
+        return dict(result)
 
-    def delete(self, task: Task) -> Task:
-        self.db.delete(task)
-        self.db.commit()
-        return task
+    async def delete(self, id: int) -> Dict[str, Any]:
+        query = delete(task).where(task.c.id == id).returning(task)
+        result = await self.db.fetch_one(query)
+        return dict(result)

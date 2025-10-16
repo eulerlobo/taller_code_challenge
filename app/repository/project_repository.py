@@ -1,24 +1,35 @@
-from app.models.project import Project
+from typing import Optional, Dict, Any
+from databases import Database
+from sqlalchemy import select, insert, update, delete
+
+from app.models.project import project
+
 
 class ProjectRepository:
-    def __init__(self, db):
+    def __init__(self, db: Database):
         self.db = db
 
-    def get_by_id(self, id):
-        return self.db.query(Project).filter(Project.id == id).first()
+    async def get_by_id(self, id: int) -> Optional[Dict[str, Any]]:
+        query = select(project).where(project.c.id == id)
+        result = await self.db.fetch_one(query)
+        return dict(result) if result else None
 
-    def create(self, project: Project) -> Project:
-        self.db.add(project)
-        self.db.commit()
-        self.db.refresh(project)
-        return project
+    async def create(self, project_data: Dict[str, Any]) -> Dict[str, Any]:
+        query = insert(project).values(**project_data).returning(project)
+        result = await self.db.fetch_one(query)
+        return dict(result)
 
-    def update(self, project: Project) -> Project:
-        self.db.commit()
-        self.db.refresh(project)
-        return project
+    async def update(self, id: int, project_data: Dict[str, Any]) -> Dict[str, Any]:
+        query = (
+            update(project)
+            .where(project.c.id == id)
+            .values(**project_data)
+            .returning(project)
+        )
+        result = await self.db.fetch_one(query)
+        return dict(result)
 
-    def delete(self, project: Project) -> Project:
-        self.db.delete(project)
-        self.db.commit()
-        return project
+    async def delete(self, id: int) -> Dict[str, Any]:
+        query = delete(project).where(project.c.id == id).returning(project)
+        result = await self.db.fetch_one(query)
+        return dict(result)
