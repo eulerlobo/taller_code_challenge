@@ -1,7 +1,14 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+class TaskCreate(BaseModel):
+    project_id: int
+    title: str = Field(..., min_length=1, max_length=100)
+    priority: int
+    completed: bool = False
+    due_date: Optional[datetime] = None
 
 class TaskResponse(BaseModel):
     """Schema for task response"""

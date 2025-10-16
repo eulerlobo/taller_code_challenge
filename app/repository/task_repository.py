@@ -8,3 +8,9 @@ class TaskRepository:
 
     def get_by_project_id(self, project_id: int) -> List[Task]:
         return self.db.query(Task).filter(Task.project_id == project_id).all()
+
+    def create(self, task: Task) -> Task:
+        self.db.add(task)
+        self.db.commit()
+        self.db.refresh(task)
+        return task

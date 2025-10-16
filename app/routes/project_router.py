@@ -9,7 +9,7 @@ from app.exceptions.project import ProjectNotFoundException
 from app.repository.project_repository import ProjectRepository
 from app.repository.task_repository import TaskRepository
 from app.schemas.project import ProjectResponse, ProjectCreate, ProjectUpdate
-from app.schemas.task import TaskResponse
+from app.schemas.task import TaskResponse, TaskCreate
 from app.services.project_service import ProjectService
 from app.services.task_service import TaskService
 
@@ -96,4 +96,19 @@ def get_project_tasks(
     except ProjectNotFoundException as e:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND, detail=e.message
+        ) from e
+
+@router.post("/{project_id}/tasks")
+def insert_task(
+    task_data: TaskCreate,
+    project_service: Annotated[ProjectService, Depends(get_project_service)],
+    task_service: Annotated[TaskService, Depends(get_task_service)],
+) -> TaskResponse:
+    try:
+        project_service.get_project_by_id(task_data.project_id)
+        task = task_service.create_task(task_data)
+        return TaskResponse.model_validate(task)
+    except ProjectNotFoundException as e:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST, detail=e.message
         ) from e
