@@ -8,4 +8,7 @@ CREATE TABLE task (
     CONSTRAINT fk_project
         FOREIGN KEY(project_id)
         REFERENCES project(id)
-)
+);
+
+-- INDEX to optimize queries filtering by project_id and priority
+CREATE INDEX idx_task_project_priority ON task(project_id, priority);
